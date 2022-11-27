@@ -1,39 +1,45 @@
 package com.example.diceroller
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 
+private const val TAG = "MainActivity"
+
 class MainActivity : AppCompatActivity() {
+    private val die = Die()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         enableClickBehavior()
+        rollDie()
     }
 
     private fun enableClickBehavior() {
         val rollButton: Button = findViewById(R.id.rollButton)
-        val die = Die()
 
-        rollButton.setOnClickListener { rollDieAndInform(die) }
+        rollButton.setOnClickListener { rollDie() }
     }
 
-    private fun rollDieAndInform(die: Die) {
+    private fun rollDie() {
         die.roll()
-
-        updateText(R.id.rollText,  die.currentValue.toString())
-        createToast("You've rolled ${die.rollCount} time(s)")
+        updateImage(R.id.die,  die.currentValue)
     }
 
-    private fun updateText(viewId: Int, textContent: String) {
-        val textView: TextView = findViewById(viewId)
-        textView.text = textContent
-    }
+    private fun updateImage(viewId: Int, roll: Int) {
+        val imageView: ImageView = findViewById(viewId)
+        val imageName = "dice_${roll}"
+        val imageId = resources.getIdentifier(imageName, "drawable", packageName)
 
-    private fun createToast(text: String) {
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
+        if (imageId > 0) {
+            imageView.setImageResource(imageId)
+            imageView.contentDescription = "A die showing the number $roll"
+        } else {
+            Log.e(TAG, "ERROR: COULD NOT GET DICE IMAGE FOR $roll")
+        }
     }
 }
